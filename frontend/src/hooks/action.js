@@ -1,0 +1,2 @@
+export function action(form, handler){form?.addEventListener('submit',async e=>{e.preventDefault();const b=form.querySelector('button[type=submit]');if(b)b.disabled=true;try{await handler(form);message('已保存，记录可复查');}catch(err){message(err.message,true);}finally{if(b)b.disabled=false;}});}
+export function message(text,error=false){let el=document.querySelector('#notice');if(!el)return;el.textContent=text;el.className=error?'notice error':'notice';el.hidden=false;}

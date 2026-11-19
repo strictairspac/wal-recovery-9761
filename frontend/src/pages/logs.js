@@ -1,0 +1,8 @@
+import {store} from '../stores/entities.js';
+import {session} from '../stores/session.js';
+import {logSetsAPI} from '../api/entities.js';
+import {table} from '../components/common/table.js';
+import {esc,formObject} from '../utils/html.js';
+import {action} from '../hooks/action.js';
+export function logsPage(){const sample=store.logs[0];return `<div class="section-title"><h2>事务日志集</h2><span>最多200条日志 / 30个键</span></div>${table(['日志集','初始账本','记录数','说明'],store.logs.map(s=>[esc(s.name),esc(JSON.stringify(s.initial)),s.records.length,esc(s.description)]))}<section class="split"><div><h2>录入一段可复查历史</h2><p>日志支持begin / write / commit / abort / checkpoint。写入只允许初始账本已有键；检查点要求无活动事务。同一键遵守严格事务写锁。</p><p class="big-note">写入先留日志，恢复再核对。</p><details><summary>查看示例完整日志</summary><pre>${esc(JSON.stringify(sample?.records||[],null,2))}</pre></details></div>${session.role!=='viewer'?`<form id="log-form"><label>日志集名<input name="name" value="shift-20261117" required></label><label>说明<input name="description" value="晚班采样账本故障复核"></label><label>初始账本 JSON<textarea name="initial" rows="2" required>${esc(JSON.stringify(sample?.initial||{sample_A:100,sample_B:50}))}</textarea></label><label>日志 JSON 数组<textarea name="records" rows="8" required>${esc(JSON.stringify(sample?.records||[],null,2))}</textarea></label><button type="submit">校验并保存日志集</button></form>`:'<p class="readonly">观察员仅查看，新增需要操作员或管理员。</p>'}</section>`;}
+export function bindLogs(render){action(document.querySelector('#log-form'),async f=>{const d=formObject(f);d.initial=JSON.parse(d.initial);d.records=JSON.parse(d.records);await logSetsAPI.create(d);await render();});}

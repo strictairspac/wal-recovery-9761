@@ -1,0 +1,1 @@
+export const session={token:localStorage.getItem('wal-token')||'',role:localStorage.getItem('wal-role')||'',save(d){this.token=d.access_token;this.role=d.role;localStorage.setItem('wal-token',this.token);localStorage.setItem('wal-role',this.role);},clear(){this.token='';this.role='';localStorage.removeItem('wal-token');localStorage.removeItem('wal-role');}};
